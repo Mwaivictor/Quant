@@ -1,0 +1,44 @@
+{
+  "status": "UNHEALTHY",
+  "success_rate_pct": 0.0,
+  "total_computations": 0,
+  "metrics": {
+    "computation": {
+      "features_computed_total": 0,
+      "features_failed": 0,
+      "symbols_processed": 0,
+      "timeframes_processed": 0
+    },
+    "performance": {
+      "avg_computation_time_ms": 0.0,
+      "max_computation_time_ms": 0.0,
+      "total_bars_processed": 0
+    },
+    "data_quality": {
+      "avg_feature_coverage_pct": 0.0,
+      "normalization_success_pct": 0.0,
+      "validation_pass_pct": 0.0
+    },
+    "storage": {
+      "feature_store_writes": 0,
+      "feature_store_reads": 0,
+      "feature_versions_stored": 0
+    },
+    "errors": {
+      "validation_errors": 0,
+      "computation_errors": 0,
+      "storage_errors": 0
+    },
+    "timestamps": {
+      "last_computation_time": null,
+      "last_success_time": null,
+      "monitor_start_time": "2025-12-22T10:07:55.822910+00:00",
+      "uptime_seconds": 35.161238
+    }
+  },
+  "recent_errors": {
+    "validation": [],
+    "computation": [],
+    "storage": []
+  }
+}

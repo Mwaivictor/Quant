@@ -1,0 +1,48 @@
+{
+  "status": "UNHEALTHY",
+  "success_rate_pct": 98.77,
+  "total_computations": 81,
+  "metrics": {
+    "computation": {
+      "features_computed_total": 80,
+      "features_failed": 1,
+      "symbols_processed": 3,
+      "timeframes_processed": 2
+    },
+    "performance": {
+      "avg_computation_time_ms": 15.33,
+      "max_computation_time_ms": 19.35,
+      "total_bars_processed": 1000
+    },
+    "data_quality": {
+      "avg_feature_coverage_pct": 98.5,
+      "normalization_success_pct": 100.0,
+      "validation_pass_pct": 0.0
+    },
+    "storage": {
+      "feature_store_writes": 1,
+      "feature_store_reads": 1,
+      "feature_versions_stored": 1
+    },
+    "errors": {
+      "validation_errors": 1,
+      "computation_errors": 1,
+      "storage_errors": 0
+    },
+    "timestamps": {
+      "last_computation_time": "2025-12-22T10:06:34.232970+00:00",
+      "last_success_time": "2025-12-22T10:06:34.232970+00:00",
+      "monitor_start_time": "2025-12-22T10:06:34.155758+00:00",
+      "uptime_seconds": 0.080438
+    }
+  },
+  "recent_errors": {
+    "validation": [
+      "2025-12-22T10:06:34.232970+00:00 | Missing required columns"
+    ],
+    "computation": [
+      "2025-12-22T10:06:34.232970+00:00 | BTCUSD 1H | Insufficient data"
+    ],
+    "storage": []
+  }
+}
