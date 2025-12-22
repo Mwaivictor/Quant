@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+
+# Data and logs
+arbitrex/data/raw/ohlcv/**/*.csv
+arbitrex/data/raw/ticks/**/*.csv
+arbitrex/data/raw/parquet/**/*.parquet
+*.log
+*.db
+*.db-journal
+
+# Redis
+Redis/dump.rdb
+Redis/*.conf
+
+# MetaTrader 5
+*.ex5
+MQL5/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Documentation artifacts
+*.docx
+~$*.docx
+
+# Keep metadata structure but ignore logs
+!arbitrex/data/raw/metadata/
+arbitrex/data/raw/metadata/ingestion_logs/*.json
+arbitrex/data/raw/metadata/source_registry/*.json

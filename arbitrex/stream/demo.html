@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Arbitrex Tick Stream Demo</title>
+    <style>
+      body { font-family: monospace; background: #1e1e1e; color: #d4d4d4; padding: 20px; }
+      h2 { color: #4ec9b0; }
+      .controls { margin-bottom: 20px; }
+      input, button { padding: 8px; font-size: 14px; background: #2d2d2d; color: #d4d4d4; border: 1px solid #555; }
+      button { cursor: pointer; background: #0e639c; color: white; }
+      button:hover { background: #1177bb; }
+      .ticker { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+      .symbol-card { background: #252526; border: 1px solid #3e3e42; border-radius: 4px; padding: 15px; }
+      .symbol-name { font-size: 18px; font-weight: bold; color: #4ec9b0; margin-bottom: 10px; }
+      .price-row { display: flex; justify-content: space-between; margin: 5px 0; }
+      .bid { color: #ce9178; }
+      .ask { color: #6a9955; }
+      .last { color: #9cdcfe; }
+      .volume { color: #dcdcaa; }
+      .time { color: #858585; font-size: 12px; }
+      #log { background: #1e1e1e; border: 1px solid #3e3e42; padding: 10px; height: 200px; overflow: auto; margin-top: 20px; }
+      .tick-update { animation: highlight 0.5s; }
+      @keyframes highlight { 0% { background: #264f78; } 100% { background: #252526; } }
+    </style>
+  </head>
+  <body>
+    <h2>📊 Arbitrex Tick Stream Demo</h2>
+    
+    <div class="controls">
+      <label>Symbols (comma): <input id="symbols" value="EURUSD,GBPUSD,XAUUSD" style="width: 300px"/></label>
+      <button id="connect">Connect</button>
+    </div>
+
+    <div id="ticker" class="ticker"></div>
+    <div id="log"></div>
+
+    <script>
+      const tickData = {};
+      let ws = null;
+      let reconnectAttempts = 0;
+      let tickCount = 0;
+      
+      const log = (s) => { 
+        const logEl = document.getElementById('log');
+        const timestamp = new Date().toLocaleTimeString();
+        logEl.textContent = `[${timestamp}] ${s}\n` + logEl.textContent; 
+        console.log(`[${timestamp}] ${s}`);
+      };
+      
+      const updateUI = () => {
+        const ticker = document.getElementById('ticker');
+        ticker.innerHTML = '';
+        
+        for (const [sym, tick] of Object.entries(tickData)) {
+          const date = new Date(tick.ts * 1000);
+          const time = date.toLocaleTimeString();
+          
+          const card = document.createElement('div');
+          card.className = 'symbol-card tick-update';
+          card.innerHTML = `
+            <div class="symbol-name">${sym}</div>
+            <div class="price-row">
+              <span>Bid</span>
+              <span class="bid"><strong>${tick.bid.toFixed(5)}</strong></span>
+            </div>
+            <div class="price-row">
+              <span>Ask</span>
+              <span class="ask"><strong>${tick.ask.toFixed(5)}</strong></span>
+            </div>
+            <div class="price-row">
+              <span>Spread</span>
+              <span>${((tick.ask - tick.bid) * 10000).toFixed(1)} pips</span>
+            </div>
+            <div class="price-row">
+              <span>Volume</span>
+              <span class="volume">${tick.volume}</span>
+            </div>
+            <div class="price-row time">
+              <span>${time}</span>
+            </div>
+          `;
+          ticker.appendChild(card);
+        }
+      };
+      
+      function connect() {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          log('Closing...');
+          ws.close();
+          ws = null;
+          document.getElementById('connect').innerText = 'Connect';
+          return;
+        }
+        
+        const symbolsText = document.getElementById('symbols').value.trim();
+        if (!symbolsText) {
+          log('ERROR: Enter symbols');
+          return;
+        }
+        
+        const symbols = symbolsText.split(',').map(s => s.trim()).filter(s => s);
+        log('Connecting...');
+        log('Symbols: ' + symbols.join(', '));
+        
+        ws = new WebSocket('ws://' + window.location.hostname + ':8000/ws');
+        
+        ws.onopen = (e) => {
+          log('[OPEN] Connection established');
+          const msg = {subscribe: symbols};
+          const json = JSON.stringify(msg);
+          log('[SEND] ' + json);
+          ws.send(json);
+        };
+        
+        ws.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            
+            if (data.subscribed) {
+              log('✓ Subscribed to: ' + data.subscribed.join(', '));
+              log('Waiting for tick data...');
+            } else if (data.symbol) {
+              tickCount++;
+              tickData[data.symbol] = data;
+              updateUI();
+              
+              if (tickCount <= 10 || tickCount % 50 === 0) {
+                log(`[TICK #${tickCount}] ${data.symbol} @ ${data.bid}`);
+              }
+            } else if (data.error) {
+              log('[ERROR] Server error: ' + data.error);
+            } else {
+              log('[MSG] ' + JSON.stringify(data));
+            }
+          } catch (err) {
+            log('[ERROR] Parse failed: ' + err.message);
+            console.error('[ERROR]', err, e.data);
+          }
+        };
+        
+        ws.onerror = (e) => {
+          log('[ERROR] WebSocket error - check server is running on port 8000');
+          console.error('[WS ERROR]', e);
+        };
+        
+        ws.onclose = (e) => {
+          log(`[CLOSE] Connection closed (code: ${e.code}, reason: ${e.reason || 'none'})`);
+          ws = null;
+          document.getElementById('connect').innerText = 'Connect';
+          
+          // Auto-reconnect on unexpected close
+          if (e.code !== 1000 && reconnectAttempts < 3) {
+            reconnectAttempts++;
+            log(`Attempting reconnect ${reconnectAttempts}/3 in 3 seconds...`);
+            setTimeout(() => connect(), 3000);
+          }
+        };
+        
+        document.getElementById('connect').innerText = 'Disconnect';
+      }
+      
+      document.getElementById('connect').onclick = connect;
+    </script>
+  </body>
+</html>

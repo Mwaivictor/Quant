@@ -1,0 +1,10 @@
+{
+  "EURUSD": "FX",
+  "GBPUSD": "FX",
+  "USDJPY": "FX",
+  "XAUUSD": "FX",
+  "AAPL": "NASDAQ",
+  "MSFT": "NASDAQ",
+  "SPX": "NYSE",
+  "DOW": "NYSE"
+}
