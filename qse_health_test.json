@@ -1,0 +1,212 @@
+{
+  "timestamp": "2025-12-22T13:48:36.765956",
+  "health_status": {
+    "status": "UNHEALTHY",
+    "uptime_seconds": 0.052255,
+    "global_metrics": {
+      "total_validations": 6,
+      "valid_signals": 0,
+      "invalid_signals": 6,
+      "validity_rate": 0.0,
+      "trend_failures": 0,
+      "stationarity_failures": 0,
+      "distribution_failures": 0,
+      "correlation_failures": 0,
+      "volatility_failures": 0,
+      "avg_processing_time_ms": 6.9559017817179365,
+      "max_processing_time_ms": 7.8907012939453125,
+      "min_processing_time_ms": 5.701780319213867,
+      "avg_trend_score": 0.0,
+      "avg_adf_pvalue": 0.0,
+      "avg_z_score": 0.0
+    },
+    "symbols_tracked": 3,
+    "unhealthy_symbols": 0,
+    "recent_validations_count": 6,
+    "avg_processing_time_ms": 6.9559017817179365,
+    "validity_rate": 0.0
+  },
+  "symbol_health": {
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "last_validation_time": "2025-12-22T13:48:36.728705",
+      "consecutive_failures": 2,
+      "metrics": {
+        "total_validations": 2,
+        "valid_signals": 0,
+        "invalid_signals": 2,
+        "validity_rate": 0.0,
+        "trend_failures": 2,
+        "stationarity_failures": 0,
+        "distribution_failures": 1,
+        "correlation_failures": 0,
+        "volatility_failures": 0,
+        "avg_processing_time_ms": 7.196187973022461,
+        "max_processing_time_ms": 7.737159729003906,
+        "min_processing_time_ms": 6.655216217041016,
+        "avg_trend_score": 0.18548161328543988,
+        "avg_adf_pvalue": 2.08749055360842e-13,
+        "avg_z_score": 0.31413415570769465
+      },
+      "recent_failures": [
+        {
+          "timestamp": "2025-12-22T13:48:36.720356",
+          "reasons": [
+            "Insufficient trend persistence: 0.183 < 0.2",
+            "Distribution unstable"
+          ]
+        },
+        {
+          "timestamp": "2025-12-22T13:48:36.728705",
+          "reasons": [
+            "Insufficient trend persistence: 0.188 < 0.2"
+          ]
+        }
+      ]
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "last_validation_time": "2025-12-22T13:48:36.744095",
+      "consecutive_failures": 2,
+      "metrics": {
+        "total_validations": 2,
+        "valid_signals": 0,
+        "invalid_signals": 2,
+        "validity_rate": 0.0,
+        "trend_failures": 2,
+        "stationarity_failures": 0,
+        "distribution_failures": 0,
+        "correlation_failures": 0,
+        "volatility_failures": 2,
+        "avg_processing_time_ms": 7.127046585083008,
+        "max_processing_time_ms": 7.8907012939453125,
+        "min_processing_time_ms": 6.363391876220703,
+        "avg_trend_score": 0.1589084798738853,
+        "avg_adf_pvalue": 1.162503586931943e-10,
+        "avg_z_score": 0.6424343759001228
+      },
+      "recent_failures": [
+        {
+          "timestamp": "2025-12-22T13:48:36.735674",
+          "reasons": [
+            "Insufficient trend persistence: 0.163 < 0.2",
+            "Invalid volatility regime: LOW"
+          ]
+        },
+        {
+          "timestamp": "2025-12-22T13:48:36.744095",
+          "reasons": [
+            "Insufficient trend persistence: 0.155 < 0.2",
+            "Invalid volatility regime: HIGH"
+          ]
+        }
+      ]
+    },
+    "XAUUSD": {
+      "symbol": "XAUUSD",
+      "last_validation_time": "2025-12-22T13:48:36.759276",
+      "consecutive_failures": 2,
+      "metrics": {
+        "total_validations": 2,
+        "valid_signals": 0,
+        "invalid_signals": 2,
+        "validity_rate": 0.0,
+        "trend_failures": 1,
+        "stationarity_failures": 0,
+        "distribution_failures": 1,
+        "correlation_failures": 0,
+        "volatility_failures": 2,
+        "avg_processing_time_ms": 6.54447078704834,
+        "max_processing_time_ms": 7.3871612548828125,
+        "min_processing_time_ms": 5.701780319213867,
+        "avg_trend_score": 0.1314498902714272,
+        "avg_adf_pvalue": 0.00010147984244799386,
+        "avg_z_score": 0.28959954893447953
+      },
+      "recent_failures": [
+        {
+          "timestamp": "2025-12-22T13:48:36.750974",
+          "reasons": [
+            "Insufficient trend persistence: 0.000 < 0.2",
+            "Invalid volatility regime: HIGH"
+          ]
+        },
+        {
+          "timestamp": "2025-12-22T13:48:36.759276",
+          "reasons": [
+            "Distribution unstable",
+            "Invalid volatility regime: HIGH"
+          ]
+        }
+      ]
+    }
+  },
+  "failure_breakdown": {
+    "trend_failures": 5,
+    "stationarity_failures": 0,
+    "distribution_failures": 2,
+    "correlation_failures": 0,
+    "volatility_failures": 4
+  },
+  "recent_validations": [
+    {
+      "symbol": "EURUSD",
+      "timestamp": "2025-12-22T13:48:36.720356",
+      "valid": false,
+      "reasons": [
+        "Insufficient trend persistence: 0.183 < 0.2",
+        "Distribution unstable"
+      ],
+      "elapsed_ms": 6.655216217041016
+    },
+    {
+      "symbol": "EURUSD",
+      "timestamp": "2025-12-22T13:48:36.728705",
+      "valid": false,
+      "reasons": [
+        "Insufficient trend persistence: 0.188 < 0.2"
+      ],
+      "elapsed_ms": 7.737159729003906
+    },
+    {
+      "symbol": "GBPUSD",
+      "timestamp": "2025-12-22T13:48:36.735674",
+      "valid": false,
+      "reasons": [
+        "Insufficient trend persistence: 0.163 < 0.2",
+        "Invalid volatility regime: LOW"
+      ],
+      "elapsed_ms": 6.363391876220703
+    },
+    {
+      "symbol": "GBPUSD",
+      "timestamp": "2025-12-22T13:48:36.744095",
+      "valid": false,
+      "reasons": [
+        "Insufficient trend persistence: 0.155 < 0.2",
+        "Invalid volatility regime: HIGH"
+      ],
+      "elapsed_ms": 7.8907012939453125
+    },
+    {
+      "symbol": "XAUUSD",
+      "timestamp": "2025-12-22T13:48:36.750974",
+      "valid": false,
+      "reasons": [
+        "Insufficient trend persistence: 0.000 < 0.2",
+        "Invalid volatility regime: HIGH"
+      ],
+      "elapsed_ms": 5.701780319213867
+    },
+    {
+      "symbol": "XAUUSD",
+      "timestamp": "2025-12-22T13:48:36.760275",
+      "valid": false,
+      "reasons": [
+        "Distribution unstable",
+        "Invalid volatility regime: HIGH"
+      ],
+      "elapsed_ms": 7.3871612548828125
+    }
+  ]
+}

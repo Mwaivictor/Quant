@@ -1,0 +1,245 @@
+{
+  "timestamp": "2025-12-22T13:49:33.784420",
+  "health_status": {
+    "status": "UNHEALTHY",
+    "uptime_seconds": 0.149921,
+    "global_metrics": {
+      "total_validations": 6,
+      "valid_signals": 1,
+      "invalid_signals": 5,
+      "validity_rate": 0.16666666666666666,
+      "trend_failures": 0,
+      "stationarity_failures": 0,
+      "distribution_failures": 0,
+      "correlation_failures": 0,
+      "volatility_failures": 0,
+      "avg_processing_time_ms": 20.492076873779297,
+      "max_processing_time_ms": 30.561447143554688,
+      "min_processing_time_ms": 14.633893966674805,
+      "avg_trend_score": 0.0,
+      "avg_adf_pvalue": 0.0,
+      "avg_z_score": 0.0
+    },
+    "symbols_tracked": 5,
+    "unhealthy_symbols": 0,
+    "recent_validations_count": 6,
+    "avg_processing_time_ms": 20.492076873779297,
+    "validity_rate": 0.16666666666666666
+  },
+  "symbol_health": {
+    "EURUSD": {
+      "symbol": "EURUSD",
+      "last_validation_time": "2025-12-22T13:49:33.740164",
+      "consecutive_failures": 1,
+      "metrics": {
+        "total_validations": 2,
+        "valid_signals": 1,
+        "invalid_signals": 1,
+        "validity_rate": 0.5,
+        "trend_failures": 0,
+        "stationarity_failures": 0,
+        "distribution_failures": 1,
+        "correlation_failures": 0,
+        "volatility_failures": 0,
+        "avg_processing_time_ms": 21.1944580078125,
+        "max_processing_time_ms": 23.526906967163086,
+        "min_processing_time_ms": 18.862009048461914,
+        "avg_trend_score": 0.23857317830141592,
+        "avg_adf_pvalue": 0.0062836680721036625,
+        "avg_z_score": 1.1179200191880443
+      },
+      "recent_failures": [
+        {
+          "timestamp": "2025-12-22T13:49:33.740164",
+          "reasons": [
+            "Distribution unstable"
+          ]
+        }
+      ]
+    },
+    "GBPUSD": {
+      "symbol": "GBPUSD",
+      "last_validation_time": "2025-12-22T13:49:33.698398",
+      "consecutive_failures": 1,
+      "metrics": {
+        "total_validations": 1,
+        "valid_signals": 0,
+        "invalid_signals": 1,
+        "validity_rate": 0.0,
+        "trend_failures": 0,
+        "stationarity_failures": 0,
+        "distribution_failures": 1,
+        "correlation_failures": 0,
+        "volatility_failures": 0,
+        "avg_processing_time_ms": 30.561447143554688,
+        "max_processing_time_ms": 30.561447143554688,
+        "min_processing_time_ms": 30.561447143554688,
+        "avg_trend_score": 0.21439219083939712,
+        "avg_adf_pvalue": 1.0182195462343882e-06,
+        "avg_z_score": 0.20142990962598276
+      },
+      "recent_failures": [
+        {
+          "timestamp": "2025-12-22T13:49:33.698398",
+          "reasons": [
+            "Distribution unstable"
+          ]
+        }
+      ]
+    },
+    "USDJPY": {
+      "symbol": "USDJPY",
+      "last_validation_time": "2025-12-22T13:49:33.720215",
+      "consecutive_failures": 1,
+      "metrics": {
+        "total_validations": 1,
+        "valid_signals": 0,
+        "invalid_signals": 1,
+        "validity_rate": 0.0,
+        "trend_failures": 0,
+        "stationarity_failures": 0,
+        "distribution_failures": 0,
+        "correlation_failures": 0,
+        "volatility_failures": 1,
+        "avg_processing_time_ms": 19.79517936706543,
+        "max_processing_time_ms": 19.79517936706543,
+        "min_processing_time_ms": 19.79517936706543,
+        "avg_trend_score": 0.36660070219600904,
+        "avg_adf_pvalue": 6.451121554378595e-10,
+        "avg_z_score": 0.3771500758365191
+      },
+      "recent_failures": [
+        {
+          "timestamp": "2025-12-22T13:49:33.720215",
+          "reasons": [
+            "Invalid volatility regime: HIGH"
+          ]
+        }
+      ]
+    },
+    "XAUUSD": {
+      "symbol": "XAUUSD",
+      "last_validation_time": "2025-12-22T13:49:33.756817",
+      "consecutive_failures": 1,
+      "metrics": {
+        "total_validations": 1,
+        "valid_signals": 0,
+        "invalid_signals": 1,
+        "validity_rate": 0.0,
+        "trend_failures": 1,
+        "stationarity_failures": 0,
+        "distribution_failures": 1,
+        "correlation_failures": 0,
+        "volatility_failures": 1,
+        "avg_processing_time_ms": 14.633893966674805,
+        "max_processing_time_ms": 14.633893966674805,
+        "min_processing_time_ms": 14.633893966674805,
+        "avg_trend_score": 0.1937139725285159,
+        "avg_adf_pvalue": 3.989053892260862e-15,
+        "avg_z_score": 1.087606644122236
+      },
+      "recent_failures": [
+        {
+          "timestamp": "2025-12-22T13:49:33.756817",
+          "reasons": [
+            "Insufficient trend persistence: 0.194 < 0.2",
+            "Distribution unstable",
+            "Invalid volatility regime: HIGH"
+          ]
+        }
+      ]
+    },
+    "EURGBP": {
+      "symbol": "EURGBP",
+      "last_validation_time": "2025-12-22T13:49:33.775534",
+      "consecutive_failures": 1,
+      "metrics": {
+        "total_validations": 1,
+        "valid_signals": 0,
+        "invalid_signals": 1,
+        "validity_rate": 0.0,
+        "trend_failures": 1,
+        "stationarity_failures": 0,
+        "distribution_failures": 0,
+        "correlation_failures": 0,
+        "volatility_failures": 0,
+        "avg_processing_time_ms": 15.57302474975586,
+        "max_processing_time_ms": 15.57302474975586,
+        "min_processing_time_ms": 15.57302474975586,
+        "avg_trend_score": 0.18435343593421577,
+        "avg_adf_pvalue": 9.28019300706723e-13,
+        "avg_z_score": 0.7289431934783659
+      },
+      "recent_failures": [
+        {
+          "timestamp": "2025-12-22T13:49:33.775534",
+          "reasons": [
+            "Insufficient trend persistence: 0.184 < 0.2"
+          ]
+        }
+      ]
+    }
+  },
+  "failure_breakdown": {
+    "trend_failures": 2,
+    "stationarity_failures": 0,
+    "distribution_failures": 3,
+    "correlation_failures": 0,
+    "volatility_failures": 2
+  },
+  "recent_validations": [
+    {
+      "symbol": "EURUSD",
+      "timestamp": "2025-12-22T13:49:33.666843",
+      "valid": true,
+      "elapsed_ms": 23.526906967163086
+    },
+    {
+      "symbol": "GBPUSD",
+      "timestamp": "2025-12-22T13:49:33.698398",
+      "valid": false,
+      "reasons": [
+        "Distribution unstable"
+      ],
+      "elapsed_ms": 30.561447143554688
+    },
+    {
+      "symbol": "USDJPY",
+      "timestamp": "2025-12-22T13:49:33.720215",
+      "valid": false,
+      "reasons": [
+        "Invalid volatility regime: HIGH"
+      ],
+      "elapsed_ms": 19.79517936706543
+    },
+    {
+      "symbol": "EURUSD",
+      "timestamp": "2025-12-22T13:49:33.740164",
+      "valid": false,
+      "reasons": [
+        "Distribution unstable"
+      ],
+      "elapsed_ms": 18.862009048461914
+    },
+    {
+      "symbol": "XAUUSD",
+      "timestamp": "2025-12-22T13:49:33.756817",
+      "valid": false,
+      "reasons": [
+        "Insufficient trend persistence: 0.194 < 0.2",
+        "Distribution unstable",
+        "Invalid volatility regime: HIGH"
+      ],
+      "elapsed_ms": 14.633893966674805
+    },
+    {
+      "symbol": "EURGBP",
+      "timestamp": "2025-12-22T13:49:33.775534",
+      "valid": false,
+      "reasons": [
+        "Insufficient trend persistence: 0.184 < 0.2"
+      ],
+      "elapsed_ms": 15.57302474975586
+    }
+  ]
+}
