@@ -1,0 +1,41 @@
+{
+  "processing_timestamp": "2025-12-22T09:40:38.096817",
+  "config_version": "1.0.0",
+  "config_hash": "dd1240dfd229b965",
+  "source": {
+    "symbol": "EURUSD",
+    "timeframe": "1H",
+    "start": "2025-01-01T00:00:00+00:00",
+    "end": "2025-01-09T07:00:00+00:00"
+  },
+  "statistics": {
+    "total_bars_input": 200,
+    "valid_bars_processed": 200,
+    "features_computed": 17,
+    "feature_names": [
+      "rolling_return_3",
+      "rolling_return_6",
+      "rolling_return_12",
+      "momentum_score",
+      "vol_6",
+      "vol_12",
+      "vol_24",
+      "atr_normalized",
+      "ma_12_slope",
+      "ma_24_slope",
+      "ma_50_slope",
+      "distance_to_ma_12",
+      "distance_to_ma_24",
+      "distance_to_ma_50",
+      "efficiency_ratio",
+      "range_compression",
+      "spread_ratio"
+    ]
+  },
+  "normalization": {
+    "applied": true,
+    "window": 60
+  },
+  "warnings": [],
+  "errors": []
+}
