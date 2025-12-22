@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-12-22T15:52:55.503294",
+  "uptime_seconds": 0.003387,
+  "metrics": {
+    "total_predictions": 3,
+    "allowed_predictions": 0,
+    "suppressed_predictions": 3,
+    "allow_rate": 0.0,
+    "suppression_rate": 1.0,
+    "avg_processing_time_ms": 0.0,
+    "p50_processing_time_ms": 0.0,
+    "p95_processing_time_ms": 0.0,
+    "p99_processing_time_ms": 0.0,
+    "max_processing_time_ms": 0.0,
+    "regime_distribution": {
+      "RANGING": 1.0
+    },
+    "avg_regime_confidence": 0.5,
+    "min_regime_confidence": 0.5,
+    "predictions_per_hour": 300.0,
+    "symbol_distribution": {}
+  },
+  "alerts": [],
+  "recent_decisions": [
+    {
+      "timestamp": 

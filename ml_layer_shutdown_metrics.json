@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-12-22T16:07:47.411846",
+  "uptime_seconds": 354.300308,
+  "metrics": {
+    "total_predictions": 0,
+    "allowed_predictions": 0,
+    "suppressed_predictions": 0,
+    "allow_rate": 0.0,
+    "suppression_rate": 0.0,
+    "predictions_per_hour": 0.0,
+    "symbol_distribution": {}
+  },
+  "alerts": [],
+  "recent_decisions": []
+}

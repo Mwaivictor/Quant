@@ -1,0 +1,89 @@
+{
+  "timestamp": "2025-12-22T15:54:00.211945",
+  "uptime_seconds": 0.024868,
+  "metrics": {
+    "total_predictions": 3,
+    "allowed_predictions": 0,
+    "suppressed_predictions": 3,
+    "allow_rate": 0.0,
+    "suppression_rate": 1.0,
+    "avg_processing_time_ms": 0.0,
+    "p50_processing_time_ms": 0.0,
+    "p95_processing_time_ms": 0.0,
+    "p99_processing_time_ms": 0.0,
+    "max_processing_time_ms": 0.0,
+    "regime_distribution": {
+      "RANGING": 1.0
+    },
+    "avg_regime_confidence": 0.5,
+    "min_regime_confidence": 0.5,
+    "predictions_per_hour": 300.0,
+    "symbol_distribution": {
+      "EURUSD": 1,
+      "GBPUSD": 1,
+      "XAUUSD": 1
+    }
+  },
+  "alerts": [
+    {
+      "timestamp": "2025-12-22T15:54:00.194575",
+      "rule_name": "high_suppression_rate",
+      "severity": "warning",
+      "message": "suppression_rate > 0.9 (actual: 1.00)",
+      "metric_name": "suppression_rate",
+      "metric_value": 1.0,
+      "threshold": 0.9
+    }
+  ],
+  "recent_decisions": [
+    {
+      "timestamp": "2025-12-22 15:54:00.187077",
+      "symbol": "EURUSD",
+      "timeframe": "4H",
+      "regime": "RANGING",
+      "regime_confidence": 0.5,
+      "signal_prob": 0.472273850492489,
+      "allowed": false,
+      "decision_reasons": [
+        "Regime not allowed: RANGING",
+        "Low regime confidence: 0.500",
+        "Signal prob below entry threshold: 0.472 < 0.55",
+        "Warning: Regime not stable (recent change)"
+      ],
+      "processing_time_ms": 0.0,
+      "config_hash": "eb865791dc659ec1"
+    },
+    {
+      "timestamp": "2025-12-22 15:54:00.194575",
+      "symbol": "GBPUSD",
+      "timeframe": "4H",
+      "regime": "RANGING",
+      "regime_confidence": 0.5,
+      "signal_prob": 0.5531780109983714,
+      "allowed": false,
+      "decision_reasons": [
+        "Regime not allowed: RANGING",
+        "Low regime confidence: 0.500",
+        "Warning: Regime not stable (recent change)"
+      ],
+      "processing_time_ms": 0.0,
+      "config_hash": "eb865791dc659ec1"
+    },
+    {
+      "timestamp": "2025-12-22 15:54:00.205361",
+      "symbol": "XAUUSD",
+      "timeframe": "4H",
+      "regime": "RANGING",
+      "regime_confidence": 0.5,
+      "signal_prob": 0.49182682955438434,
+      "allowed": false,
+      "decision_reasons": [
+        "Regime not allowed: RANGING",
+        "Low regime confidence: 0.500",
+        "Signal prob below entry threshold: 0.492 < 0.55"
+      ],
+      "processing_time_ms": 0.0,
+      "config_hash": "eb865791dc659ec1"
+    }
+  ]
+}
