@@ -16,6 +16,12 @@ from arbitrex.feature_engine.schemas import FeatureVector
 from arbitrex.quant_stats.schemas import QuantStatsOutput
 from arbitrex.ml_layer.schemas import MLOutput
 
+try:
+    from arbitrex.event_bus import get_event_bus, Event, EventType
+    EVENT_BUS_AVAILABLE = True
+except ImportError:
+    EVENT_BUS_AVAILABLE = False
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,12 +50,23 @@ def get_engine() -> SignalGenerationEngine:
 async def startup_event():
     """Initialize engine on startup"""
     get_engine()
+    
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.start()
+        logger.info("✓ Event bus started for Signal Engine")
+    
     logger.info("Signal Engine API started")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Cleanup on shutdown"""
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.stop()
+        logger.info("✓ Event bus stopped")
+    
     logger.info("Signal Engine API shutting down")
 
 

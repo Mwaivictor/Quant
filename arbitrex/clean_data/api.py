@@ -27,6 +27,12 @@ from arbitrex.clean_data.integration import RawToCleanBridge
 from arbitrex.clean_data.config import CleanDataConfig
 from arbitrex.clean_data.schemas import CleanOHLCVSchema, CleanDataMetadata
 
+try:
+    from arbitrex.event_bus import get_event_bus, Event, EventType
+    EVENT_BUS_AVAILABLE = True
+except ImportError:
+    EVENT_BUS_AVAILABLE = False
+
 
 # Configure logging
 logging.basicConfig(
@@ -724,10 +730,72 @@ async def root():
             "health": "/health",
             "clean_data": "/clean/data/{symbol}/{timeframe}",
             "symbols": "/clean/symbols",
-            "validation": "/health/validation/{symbol}/{timeframe}"
+            "validation": "/health/validation/{symbol}/{timeframe}",
+            "events": "/events/metrics"
         },
         "status": "operational"
     }
+
+
+# ============================================================================
+# EVENT BUS ENDPOINTS
+# ============================================================================
+
+@app.get("/events/metrics")
+async def get_event_metrics():
+    """Get event bus metrics"""
+    if not EVENT_BUS_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Event bus not available")
+    
+    try:
+        event_bus = get_event_bus()
+        metrics = event_bus.get_metrics()
+        return {"event_bus_metrics": metrics, "timestamp": datetime.utcnow().isoformat()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Event metrics error: {str(e)}")
+
+
+@app.get("/events/health")
+async def get_event_health():
+    """Check event bus health"""
+    if not EVENT_BUS_AVAILABLE:
+        return {"event_bus_available": False, "status": "not_available"}
+    
+    try:
+        event_bus = get_event_bus()
+        metrics = event_bus.get_metrics()
+        is_healthy = metrics['running'] and metrics['events_dropped'] < metrics['events_published'] * 0.1
+        return {
+            "event_bus_available": True,
+            "status": "healthy" if is_healthy else "degraded",
+            "metrics": metrics
+        }
+    except Exception as e:
+        return {"event_bus_available": True, "status": "error", "error": str(e)}
+
+
+# ============================================================================
+# LIFECYCLE EVENTS
+# ============================================================================
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize Clean Data API and event bus"""
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.start()
+        logger.info("✓ Event bus started for Clean Data Layer")
+    logger.info("Clean Data API started")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup on shutdown"""
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.stop()
+        logger.info("✓ Event bus stopped")
+    logger.info("Clean Data API shutdown complete")
 
 
 # ============================================================================

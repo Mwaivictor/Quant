@@ -1,0 +1,18 @@
+{
+  "open_positions": {},
+  "symbol_exposure": {},
+  "currency_exposure": {},
+  "realized_pnl": 0.0,
+  "unrealized_pnl": 0.0,
+  "daily_pnl": -1500.0,
+  "weekly_pnl": -2300.0,
+  "total_capital": 100000.0,
+  "equity": 98500.0,
+  "peak_equity": 100000.0,
+  "current_drawdown": 0.0,
+  "trading_halted": false,
+  "halt_reason": null,
+  "halt_timestamp": null,
+  "last_update": "2025-12-23T06:05:01.996596",
+  "last_saved": "2025-12-23T09:05:02.002522"
+}

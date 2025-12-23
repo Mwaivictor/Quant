@@ -17,6 +17,12 @@ from arbitrex.quant_stats.config import QuantStatsConfig
 from arbitrex.quant_stats.engine import QuantitativeStatisticsEngine
 from arbitrex.quant_stats.health_monitor import QSEHealthMonitor
 
+try:
+    from arbitrex.event_bus import get_event_bus, Event, EventType
+    EVENT_BUS_AVAILABLE = True
+except ImportError:
+    EVENT_BUS_AVAILABLE = False
+
 LOG = logging.getLogger(__name__)
 
 # Initialize FastAPI app
@@ -474,6 +480,11 @@ async def reset_health():
 @app.on_event("startup")
 async def startup_event():
     """Startup tasks"""
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.start()
+        LOG.info("✓ Event bus started for Quant Stats Engine")
+    
     LOG.info("QSE API starting up...")
     LOG.info(f"Config hash: {config.get_config_hash()}")
     LOG.info(f"Config version: {config.config_version}")
@@ -490,6 +501,12 @@ async def shutdown_event():
         LOG.info("Final health report exported")
     except Exception as e:
         LOG.error(f"Failed to export final health report: {e}")
+    
+    # Stop event bus
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.stop()
+        LOG.info("✓ Event bus stopped")
 
 
 if __name__ == "__main__":

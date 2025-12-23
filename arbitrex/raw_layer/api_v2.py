@@ -34,6 +34,12 @@ import logging
 from arbitrex.raw_layer.config import TRADING_UNIVERSE, DEFAULT_TIMEFRAMES
 from arbitrex.raw_layer.health import get_health_monitor, init_health_monitor
 
+try:
+    from arbitrex.event_bus import get_event_bus, Event, EventType
+    EVENT_BUS_AVAILABLE = True
+except ImportError:
+    EVENT_BUS_AVAILABLE = False
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -134,6 +140,13 @@ async def startup_event():
     """Initialize on startup"""
     logger.info("Starting Raw Data API...")
     init_health_monitor()
+    
+    # Start event bus
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.start()
+        logger.info("✓ Event bus started for Raw Data Layer")
+    
     logger.info("Raw Data API started successfully")
 
 
@@ -141,6 +154,12 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown"""
     logger.info("Shutting down Raw Data API...")
+    
+    # Stop event bus
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.stop()
+        logger.info("✓ Event bus stopped")
 
 
 # ============================================================================
@@ -371,6 +390,76 @@ async def get_prometheus_metrics():
     except Exception as e:
         logger.error(f"Metrics failed: {e}")
         raise HTTPException(500, str(e))
+
+
+# ============================================================================
+# Event Bus Endpoints
+# ============================================================================
+
+@app.get("/events/metrics", tags=["Health"])
+async def get_event_metrics():
+    """
+    Get event bus metrics and statistics.
+    
+    Returns:
+        Event bus metrics including published, dispatched, and dropped events
+    """
+    if not EVENT_BUS_AVAILABLE:
+        raise HTTPException(
+            status_code=503,
+            detail="Event bus not available"
+        )
+    
+    try:
+        event_bus = get_event_bus()
+        metrics = event_bus.get_metrics()
+        return {
+            'event_bus_metrics': metrics,
+            'timestamp': datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Event metrics error: {e}")
+        raise HTTPException(status_code=500, detail=f"Event metrics error: {str(e)}")
+
+
+@app.get("/events/health", tags=["Health"])
+async def get_event_health():
+    """
+    Check event bus health status.
+    
+    Returns:
+        Event bus availability and health metrics
+    """
+    if not EVENT_BUS_AVAILABLE:
+        return {
+            'event_bus_available': False,
+            'status': 'not_available',
+            'message': 'Event bus module not installed'
+        }
+    
+    try:
+        event_bus = get_event_bus()
+        metrics = event_bus.get_metrics()
+        
+        # Determine health based on metrics
+        is_healthy = (
+            metrics['running'] and
+            metrics['events_dropped'] < metrics['events_published'] * 0.1  # Less than 10% dropped
+        )
+        
+        return {
+            'event_bus_available': True,
+            'status': 'healthy' if is_healthy else 'degraded',
+            'metrics': metrics,
+            'timestamp': datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Event health check error: {e}")
+        return {
+            'event_bus_available': True,
+            'status': 'error',
+            'error': str(e)
+        }
 
 
 # ============================================================================

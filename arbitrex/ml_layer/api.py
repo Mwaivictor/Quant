@@ -23,6 +23,12 @@ from arbitrex.ml_layer.model_registry import ModelRegistry
 from arbitrex.ml_layer.monitoring import MLMonitor
 from arbitrex.ml_layer.schemas import MLOutput, RegimeLabel
 
+try:
+    from arbitrex.event_bus import get_event_bus, Event, EventType
+    EVENT_BUS_AVAILABLE = True
+except ImportError:
+    EVENT_BUS_AVAILABLE = False
+
 LOG = logging.getLogger(__name__)
 
 # Initialize FastAPI
@@ -96,6 +102,12 @@ async def startup_event():
         ml_monitor = MLMonitor(config)
         model_registry = ModelRegistry()
         
+        # Start event bus
+        if EVENT_BUS_AVAILABLE:
+            event_bus = get_event_bus()
+            event_bus.start()
+            LOG.info("✓ Event bus started for ML Layer")
+        
         LOG.info("✓ ML Layer API started successfully")
         LOG.info(f"  Config hash: {config.get_config_hash()}")
         LOG.info(f"  Monitoring enabled: {config.governance.enable_prediction_logging}")
@@ -114,7 +126,15 @@ async def shutdown_event():
         if ml_monitor:
             # Export final metrics
             ml_monitor.export_metrics("ml_layer_shutdown_metrics.json")
-            LOG.info("✓ ML Layer API shutdown complete")
+            LOG.info("✓ ML Layer metrics exported")
+        
+        # Stop event bus
+        if EVENT_BUS_AVAILABLE:
+            event_bus = get_event_bus()
+            event_bus.stop()
+            LOG.info("✓ Event bus stopped")
+        
+        LOG.info("✓ ML Layer API shutdown complete")
     except Exception as e:
         LOG.error(f"Error during shutdown: {e}")
 

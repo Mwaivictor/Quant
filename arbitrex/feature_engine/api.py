@@ -20,6 +20,12 @@ from arbitrex.feature_engine.feature_store import FeatureStore
 from arbitrex.feature_engine.health_monitor import FeatureEngineHealthMonitor
 from arbitrex.feature_engine.schemas import FeatureVector
 
+try:
+    from arbitrex.event_bus import get_event_bus, Event, EventType
+    EVENT_BUS_AVAILABLE = True
+except ImportError:
+    EVENT_BUS_AVAILABLE = False
+
 LOG = logging.getLogger(__name__)
 
 # Initialize FastAPI app
@@ -478,12 +484,54 @@ async def get_feature_schema(
 
 
 # ============================================================================
+# EVENT BUS ENDPOINTS
+# ============================================================================
+
+@app.get("/events/metrics")
+async def get_event_metrics():
+    """Get event bus metrics"""
+    if not EVENT_BUS_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Event bus not available")
+    
+    try:
+        event_bus = get_event_bus()
+        metrics = event_bus.get_metrics()
+        return {"event_bus_metrics": metrics, "timestamp": datetime.utcnow(timezone.utc).isoformat()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Event metrics error: {str(e)}")
+
+
+@app.get("/events/health")
+async def get_event_health():
+    """Check event bus health"""
+    if not EVENT_BUS_AVAILABLE:
+        return {"event_bus_available": False, "status": "not_available"}
+    
+    try:
+        event_bus = get_event_bus()
+        metrics = event_bus.get_metrics()
+        is_healthy = metrics['running'] and metrics['events_dropped'] < metrics['events_published'] * 0.1
+        return {
+            "event_bus_available": True,
+            "status": "healthy" if is_healthy else "degraded",
+            "metrics": metrics
+        }
+    except Exception as e:
+        return {"event_bus_available": True, "status": "error", "error": str(e)}
+
+
+# ============================================================================
 # STARTUP/SHUTDOWN
 # ============================================================================
 
 @app.on_event("startup")
 async def startup_event():
     """Initialize services on startup"""
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.start()
+        LOG.info("✓ Event bus started for Feature Engine")
+    
     LOG.info("Feature Engine API starting up...")
     LOG.info(f"Config version: {config.config_version}")
     LOG.info(f"Config hash: {config.get_config_hash()}")
@@ -498,6 +546,13 @@ async def shutdown_event():
     # Export final health metrics
     health_monitor.export_metrics()
     LOG.info("Health metrics exported")
+    
+    # Stop event bus
+    if EVENT_BUS_AVAILABLE:
+        event_bus = get_event_bus()
+        event_bus.stop()
+        LOG.info("✓ Event bus stopped")
+    
     LOG.info("API shutdown complete")
 
 

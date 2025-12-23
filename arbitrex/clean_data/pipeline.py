@@ -8,6 +8,11 @@ Philosophy:
     - No partial writes
     - Explicit error messages
     - Complete auditability
+    
+Parallelism:
+    - Per-symbol processing (fully independent)
+    - Event-driven normalized bar emission
+    - No cross-symbol blocking
 """
 
 import pandas as pd
@@ -17,6 +22,8 @@ from datetime import datetime
 from typing import Optional, Dict, List, Tuple
 import logging
 import json
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from arbitrex.clean_data.config import CleanDataConfig, DEFAULT_CONFIG
 from arbitrex.clean_data.schemas import CleanOHLCVSchema, CleanDataMetadata
@@ -43,20 +50,24 @@ class CleanDataPipeline:
          → Spread Estimation (optional)
          → Validity Check
          → Write fx_ohlcv_clean
+         → Emit NormalizedBarReady Event
     
     Guarantees:
         - Deterministic output
         - Full auditability
         - Fail-fast on errors
         - No partial writes
+        - Per-symbol isolation (no blocking)
     """
     
-    def __init__(self, config: Optional[CleanDataConfig] = None):
+    def __init__(self, config: Optional[CleanDataConfig] = None, emit_events: bool = False, max_workers: int = 10):
         """
         Initialize pipeline with configuration.
         
         Args:
             config: CleanDataConfig instance (uses DEFAULT_CONFIG if None)
+            emit_events: Enable event emission for downstream consumers
+            max_workers: Number of parallel worker threads
         """
         self.config = config or DEFAULT_CONFIG
         
@@ -72,6 +83,23 @@ class CleanDataPipeline:
         self.processing_stats = {}
         self.warnings = []
         self.errors = []
+        
+        # Event-driven processing
+        self._emit_events = emit_events
+        self._event_bus = None
+        if emit_events:
+            try:
+                from arbitrex.event_bus import get_event_bus, Event, EventType
+                self._event_bus = get_event_bus()
+                self._Event = Event
+                self._EventType = EventType
+            except ImportError:
+                self._emit_events = False
+                LOG.warning("Event bus not available, running without events")
+        
+        # Parallel processing
+        self._executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="CleanDataWorker")
+        self._lock = threading.Lock()
     
     def process_symbol(
         self,
@@ -82,6 +110,8 @@ class CleanDataPipeline:
     ) -> Tuple[Optional[pd.DataFrame], CleanDataMetadata]:
         """
         Process single symbol through complete pipeline.
+        
+        This method is thread-safe and can be called in parallel for different symbols.
         
         Args:
             raw_df: Raw OHLCV dataframe
@@ -195,6 +225,26 @@ class CleanDataPipeline:
                 f"{metadata.valid_bars}/{metadata.total_bars_processed} valid bars"
             )
             
+            # Emit NormalizedBarReady event (non-blocking)
+            if self._emit_events and self._event_bus and not df.empty:
+                try:
+                    event = self._Event(
+                        event_type=self._EventType.NORMALIZED_BAR_READY,
+                        timestamp=datetime.utcnow(),
+                        symbol=symbol,
+                        data={
+                            'timeframe': timeframe,
+                            'bar_count': len(df),
+                            'valid_bars': metadata.valid_bars,
+                            'accepted': should_accept,
+                            'processing_time_seconds': processing_time,
+                            'latest_timestamp': df.index[-1].isoformat() if hasattr(df.index[-1], 'isoformat') else str(df.index[-1])
+                        }
+                    )
+                    self._event_bus.publish(event)
+                except Exception as e:
+                    LOG.warning(f"Failed to emit NormalizedBarReady event: {e}")
+            
             return df, metadata
             
         except Exception as e:
@@ -213,11 +263,61 @@ class CleanDataPipeline:
         output_dir: Optional[Path] = None
     ) -> Dict[str, Tuple[Optional[pd.DataFrame], CleanDataMetadata]]:
         """
-        Process multiple symbols in batch.
+        Process multiple symbols in parallel.
         
         Args:
             raw_data: Dict mapping symbol to raw dataframe
             timeframe: Timeframe for all symbols
+            output_dir: Directory to save cleaned data (optional)
+        
+        Returns:
+            Dict mapping symbol to (clean_df, metadata)
+        
+        Performance:
+            - Symbols processed in parallel (up to max_workers)
+            - Each symbol fully independent
+            - No cross-symbol blocking
+        """
+        LOG.info(f"Processing {len(raw_data)} symbols in parallel (max_workers={self._executor._max_workers})")
+        start_time = datetime.utcnow()
+        
+        results = {}
+        
+        # Submit all symbols to thread pool
+        future_to_symbol = {
+            self._executor.submit(self.process_symbol, df, symbol, timeframe): symbol
+            for symbol, df in raw_data.items()
+        }
+        
+        # Collect results as they complete
+        for future in as_completed(future_to_symbol):
+            symbol = future_to_symbol[future]
+            try:
+                clean_df, metadata = future.result()
+                results[symbol] = (clean_df, metadata)
+                LOG.info(f"Completed {symbol}: {metadata.valid_bars} valid bars")
+            except Exception as e:
+                LOG.error(f"Failed to process {symbol}: {e}")
+                # Return None for failed symbols
+                results[symbol] = (None, None)
+        
+        processing_time = (datetime.utcnow() - start_time).total_seconds()
+        LOG.info(f"Processed {len(results)} symbols in {processing_time:.2f}s ({processing_time/len(results):.2f}s per symbol average)")
+        
+        return results
+    
+    def process_multiple_symbols_sequential(
+        self,
+        raw_data: Dict[str, pd.DataFrame],
+        timeframe: str,
+        output_dir: Optional[Path] = None
+    ) -> Dict[str, Tuple[pd.DataFrame, CleanDataMetadata]]:
+        """
+        Process multiple symbols sequentially (legacy method).
+        
+        Args:
+            raw_data: Dict mapping symbol to raw OHLCV data
+            timeframe: Target timeframe
             output_dir: Optional output directory for writing results
         
         Returns:
@@ -306,7 +406,7 @@ class CleanDataPipeline:
         if "timeframe" not in df.columns:
             df["timeframe"] = timeframe
         if "source_id" not in df.columns:
-            df["source_id"] = source_id if source_id else np.nan
+            df["source_id"] = source_id if source_id else "unknown"  # Use string, not np.nan
         if "schema_version" not in df.columns:
             df["schema_version"] = CleanOHLCVSchema.schema_version
         

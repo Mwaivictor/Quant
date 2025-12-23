@@ -1,6 +1,7 @@
 import sqlite3
 import threading
 from typing import List, Tuple, Optional
+from datetime import datetime
 
 
 class TickQueue:
@@ -8,10 +9,26 @@ class TickQueue:
 
     Schema: ticks(id INTEGER PRIMARY KEY AUTOINCREMENT, symbol TEXT, ts INTEGER,
     bid REAL, ask REAL, last REAL, volume REAL, seq TEXT)
+    
+    Features:
+    - Per-symbol isolation (no cross-symbol blocking)
+    - Event emission on tick receipt (optional)
     """
-    def __init__(self, path: str):
+    def __init__(self, path: str, emit_events: bool = False):
         self._path = path
         self._lock = threading.RLock()
+        self._emit_events = emit_events
+        self._event_bus = None
+        
+        if emit_events:
+            try:
+                from arbitrex.event_bus import get_event_bus, Event, EventType
+                self._event_bus = get_event_bus()
+                self._Event = Event
+                self._EventType = EventType
+            except ImportError:
+                self._emit_events = False
+        
         self._conn = sqlite3.connect(self._path, check_same_thread=False)
         self._conn.execute(
             """CREATE TABLE IF NOT EXISTS ticks (
@@ -34,7 +51,27 @@ class TickQueue:
             cur.execute("INSERT INTO ticks(symbol, ts, bid, ask, last, volume, seq) VALUES (?,?,?,?,?,?,?)",
                         (symbol, int(ts), bid, ask, last, volume, seq))
             self._conn.commit()
-            return cur.lastrowid
+            tick_id = cur.lastrowid
+            
+            # Emit event (non-blocking)
+            if self._emit_events and self._event_bus:
+                event = self._Event(
+                    event_type=self._EventType.TICK_RECEIVED,
+                    timestamp=datetime.utcnow(),
+                    symbol=symbol,
+                    data={
+                        'tick_id': tick_id,
+                        'ts': ts,
+                        'bid': bid,
+                        'ask': ask,
+                        'last': last,
+                        'volume': volume,
+                        'seq': seq
+                    }
+                )
+                self._event_bus.publish(event)
+            
+            return tick_id
 
     def dequeue_all_for_symbol(self, symbol: str) -> List[Tuple[int, int, Optional[float], Optional[float], Optional[float], Optional[float], Optional[str]]]:
         with self._lock:
